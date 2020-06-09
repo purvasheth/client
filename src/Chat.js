@@ -13,6 +13,7 @@ import BooleanContext from "./BooleanContext"
 let socket;
 
 const Chat = (props) => {
+    const [focus, setFocus] = React.useState(true)
     const [text, setText] = React.useState("")
     const [Messages, setMessages] = React.useState([])
     const [online, setOnline] = useImmer([]);
@@ -159,7 +160,7 @@ const Chat = (props) => {
                     }}></span>
                 }</p>)}
             </div>
-            {Messages.length !== 0 ? <div className="display">
+            {Messages.length !== 0 && focus === true ? <div className="display">
                 {
                     Messages.map(
                         (chat, i) => (
@@ -183,6 +184,7 @@ const Chat = (props) => {
                 <TextField
                     label="Number"
                     value={text}
+                    onFocus={() => setFocus(false)}
                     inputProps={{ pattern: "^$|([1-9]|1[0-9]|2[0-5])$" }}
                     onChange={(e) => setText(e.target.value)}
                 />
@@ -193,6 +195,7 @@ const Chat = (props) => {
 
                         if (text.match("^([1-9]|1[0-9]|2[0-5])$")) {
                             handleSend(props.name, text)
+                            setFocus(true)
                         }
                         else {
                             alert('please enter no between 1 and 25')
