@@ -1,5 +1,4 @@
 import React from "react"
-import Chip from '@material-ui/core/Chip';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import io from "socket.io-client"
@@ -148,7 +147,6 @@ const Chat = (props) => {
 
     return (
         <div >
-
             <div className="playerlist">
                 <h3>Players:</h3>
                 {online.map(m => <p key={m[0]}>{m[1]}{" "}{turn === m[0] &&

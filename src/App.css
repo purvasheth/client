@@ -5,23 +5,24 @@
     left: 50%;
     transform: translate(-50%, -50%);
 }
+.playerlist{
+  padding: 20px
+}
 
 
 .display {
-  line-height: 30px;
+  position:absolute;
   font-size: 1.25rem;
   padding: 10px;
-  width:50%;
+  left:50%;
   margin: 0 auto;
-  max-width: 150px;
+  top:5%;
+  max-width: 200px;
   color:#26466D;
   text-align: center;
   background-color: #B9D3EE;
+  transform: translate(-50%, -50%);
 }
 
-@media (max-width: 600px) {
-    section {
-      flex-direction: row;
-    }
-  }
+
 
