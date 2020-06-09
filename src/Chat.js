@@ -1,50 +1,96 @@
 import React from "react"
-import Paper from '@material-ui/core/Paper';
-import { makeStyles } from '@material-ui/core/styles';
 import Chip from '@material-ui/core/Chip';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import io from "socket.io-client"
 import { useImmer } from 'use-immer'
+import "./App.css"
+import Grid from "./Grid"
+import GridContext from "./GridContext"
+import BooleanContext from "./BooleanContext"
 
-
-
-
-const useStyles = makeStyles((theme) => ({
-    root: {
-        margin: "50px",
-        padding: theme.spacing(2, 3),
-        flex: "display",
-
-        //flexDirection: "column",
-    },
-    chatWindow: {
-
-        height: "500px",
-        padding: theme.spacing(1, 1),
-        borderBottom: '8px solid grey'
-    },
-    chatBox: {
-        padding: theme.spacing(1, 1),
-        height: "50px",
-    },
-}))
 
 
 let socket;
 
-
-
 const Chat = (props) => {
     const [text, setText] = React.useState("")
-    const classes = useStyles();
     const [Messages, setMessages] = React.useState([])
     const [online, setOnline] = useImmer([]);
     const [turn, setTurn] = React.useState('')
     const [id, setId] = React.useState('id')
+    const [bingo, setBingo] = React.useState([true, true, true, true, true])
+    const [word] = React.useState(['B', 'I', 'N', 'G', 'O'])
+    const [game] = React.useContext(GridContext)
+    const [bool, setBool] = React.useContext(BooleanContext)
+    function Check() {
+        let lines = 0
+        //across rows
+        for (let i = 0; i < 5; i++) {
+            let flag = true
+            for (let j = 0; j < 5; j++) {
+                if (bool[i][j] === true) {
+                    flag = false
+                    break
+                }
+            }
+            if (flag === true) {
+                lines = lines + 1
+            }
+        }
+        //across columns
+        for (let i = 0; i < 5; i++) {
+            let flag = true
+            for (let j = 0; j < 5; j++) {
+                if (bool[j][i] === true) {
+                    flag = false
+                    break
+                }
+            }
+            if (flag === true) {
+                lines = lines + 1
+            }
+        }
+        let newBingo = [true, true, true, true, true]
+        if (lines > 0) {
+            for (let i = 0; i < lines; i++) {
+                newBingo[i] = false
+            }
+        }
+        setBingo(newBingo)
+        if (lines === 5) {
+            socket.emit("won", props.name, props.room);
+        }
+
+    }
+
+    function Main(num) {
+        //set the boolean matrix
+        //check the game matrix
+
+        if (num !== "" && num < 26 && num > 0) {
+            let row = 0
+            let col = 0
+            for (let i = 0; i < 5; i++) {
+                for (let j = 0; j < 5; j++) {
+                    if (game[i][j] === num) {
+                        row = i
+                        col = j
+                        break
+                    }
+                }
+            }
+            let newBool = [...bool];
+            newBool[row][col] = false
+            setBool(newBool)
+            Check()
+        }
+
+    }
 
     if (!socket) {
         socket = io('https://rocky-tor-15250.herokuapp.com/')
+        //socket = io(':3001');
         socket.emit("join", props.name, props.room);
 
     }
@@ -53,6 +99,7 @@ const Chat = (props) => {
         // console.log(name, text);
         socket.emit('chat message', [name, text], props.room, id)
         setMessages([[name, text]])
+        Main(+text)
         setText("")
     }
 
@@ -60,6 +107,12 @@ const Chat = (props) => {
         socket.on('broadcast', (message) => {
             //console.log('works', message)
             setMessages([message])
+            Main(+message[1])
+        })
+
+        socket.on('won', (name) => {
+            alert(name + " Won!")
+            window.location.reload(false)
         })
 
         socket.on('people-list', people => {
@@ -94,38 +147,64 @@ const Chat = (props) => {
     }, [])
 
     return (
-        <div className={classes.root}>
-            <Paper>
+        <div >
 
-                <div className={classes.chatWindow}>
-                    {
-                        Messages.map(
-                            (chat, i) => (
-                                <div key={i}><Chip label={chat[0]} />{" selected "}{chat[1]}</div>
-                            )
+            <div className="playerlist">
+                <h3>Players:</h3>
+                {online.map(m => <p key={m[0]}>{m[1]}{" "}{turn === m[0] &&
+                    <span style={{
+                        height: "0.5rem",
+                        width: "0.5rem",
+                        backgroundColor: "green",
+                        borderRadius: "50%",
+                        display: "inline-block"
+                    }}></span>
+                }</p>)}
+            </div>
+            {Messages.length !== 0 ? <div className="display">
+                {
+                    Messages.map(
+                        (chat, i) => (
+                            chat[0] + " : " + chat[1]
                         )
+                    )
+                }
+            </div > : false
+            }
+
+            <div className="center">
+                <h1>
+                    {word.map((letter, i) => (
+                        <span key={i} style={{ textDecorationLine: bingo[i] === false && "line-through", padding: "0.5rem" }}>{letter}</span>
+                    ))
                     }
+                </h1>
+                <Grid />
+                <br />
+                <br />
+                <TextField
+                    label="Number"
+                    value={text}
+                    inputProps={{ pattern: "^$|([1-9]|1[0-9]|2[0-5])$" }}
+                    onChange={(e) => setText(e.target.value)}
+                />
+                <br />
+                <br />
+                <Button disabled={turn === id ? false : true}
+                    variant="contained" onClick={() => {
 
-                </div >
+                        if (text.match("^([1-9]|1[0-9]|2[0-5])$")) {
+                            handleSend(props.name, text)
+                        }
+                        else {
+                            alert('please enter no between 1 and 25')
+                            setText("");
+                        }
 
-                <div className={classes.chatBox}>
-                    <TextField
-
-                        style={{ width: "80%" }}
-                        label="Message"
-                        value={text}
-                        onChange={(e) => setText(e.target.value)}
-                    />
-                    <Button disabled={turn === id ? false : true}
-                        variant="contained" onClick={() => { handleSend(props.name, text) }} color="primary">
-                        Submit
+                    }} color="primary">
+                    Select
                     </Button>
-
-                </div>
-
-            </Paper>
-            {online.map(m => <p key={m[0]}>{m[1]}</p>)}
-
+            </div>
         </div>
     )
 }
