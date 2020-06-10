@@ -4,15 +4,16 @@ import Button from '@material-ui/core/Button';
 import io from "socket.io-client"
 import { useImmer } from 'use-immer'
 import "./App.css"
-import Grid from "./Grid"
+import Grid from "./Components/Grid"
 import GridContext from "./GridContext"
 import BooleanContext from "./BooleanContext"
-
-
+import Bingo from "./Components/Bingo";
+import Players from "./Components/Players"
+import Display from "./Components/Display";
 
 let socket;
 
-const Chat = (props) => {
+const MainLogic = (props) => {
     const [focus, setFocus] = React.useState(true)
     const [text, setText] = React.useState("")
     const [Messages, setMessages] = React.useState([])
@@ -23,6 +24,7 @@ const Chat = (props) => {
     const [word] = React.useState(['B', 'I', 'N', 'G', 'O'])
     const [game] = React.useContext(GridContext)
     const [bool, setBool] = React.useContext(BooleanContext)
+
     function Check() {
         let lines = 0
         //across rows
@@ -96,7 +98,6 @@ const Chat = (props) => {
     }
 
     const handleSend = (name, text) => {
-        // console.log(name, text);
         socket.emit('chat message', [name, text], props.room, id)
         setMessages([[name, text]])
         Main(+text)
@@ -105,7 +106,6 @@ const Chat = (props) => {
 
     React.useEffect(() => {
         socket.on('broadcast', (message) => {
-            //console.log('works', message)
             setMessages([message])
             Main(+message[1])
         })
@@ -147,37 +147,14 @@ const Chat = (props) => {
     }, [])
 
     return (
-        <div >
-            <div className="playerlist">
-                <h3>Players:</h3>
-                {online.map(m => <p key={m[0]}>{m[1]}{" "}{turn === m[0] &&
-                    <span style={{
-                        height: "0.5rem",
-                        width: "0.5rem",
-                        backgroundColor: "green",
-                        borderRadius: "50%",
-                        display: "inline-block"
-                    }}></span>
-                }</p>)}
-            </div>
-            {Messages.length !== 0 && focus === true ? <div className="display">
-                {
-                    Messages.map(
-                        (chat, i) => (
-                            chat[0] + " : " + chat[1]
-                        )
-                    )
-                }
-            </div > : false
-            }
+        <React.Fragment>
+
+            <Players online={online} turn={turn} room={props.room} />
+
+            <Display Messages={Messages} focus={focus} />
 
             <div className="center">
-                <h1>
-                    {word.map((letter, i) => (
-                        <span key={i} style={{ textDecorationLine: bingo[i] === false && "line-through", padding: "0.5rem" }}>{letter}</span>
-                    ))
-                    }
-                </h1>
+                <Bingo word={word} bingo={bingo} />
                 <Grid />
                 <br />
                 <br />
@@ -185,7 +162,7 @@ const Chat = (props) => {
                     label="Number"
                     value={text}
                     onFocus={() => setFocus(false)}
-                    inputProps={{ pattern: "^$|([1-9]|1[0-9]|2[0-5])$" }}
+                    omBlur={() => setFocus(true)}
                     onChange={(e) => setText(e.target.value)}
                 />
                 <br />
@@ -206,8 +183,8 @@ const Chat = (props) => {
                     Select
                     </Button>
             </div>
-        </div>
+        </React.Fragment>
     )
 }
 
-export default Chat 
+export default MainLogic

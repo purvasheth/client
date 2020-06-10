@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
-import GridContext from "./GridContext"
-import BooleanContext from "./BooleanContext"
+import GridContext from "../GridContext"
+import BooleanContext from "../BooleanContext"
 
 const Grid = () => {
     const tableStyle = {
@@ -10,7 +10,7 @@ const Grid = () => {
     const [game] = useContext(GridContext)
     const [bool] = useContext(BooleanContext)
     return (
-        <div>
+        <React.Fragment>
             <table style={tableStyle}>
                 <tbody>
                     {game.map((value, i) => (
@@ -39,7 +39,7 @@ const Grid = () => {
                     ))}
                 </tbody>
             </table>
-        </div>
+        </React.Fragment>
     );
 }
 

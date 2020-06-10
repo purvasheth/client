@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import './App.css';
-import Main from "./Main"
 import GridContext from "./GridContext";
 import BooleanContext from "./BooleanContext";
+import LandingPage from './LandingPage';
 
 
 
@@ -39,8 +39,7 @@ function App() {
   return (
     <BooleanContext.Provider value={bool}>
       <GridContext.Provider value={game}>
-
-        <Main />
+        <LandingPage />
       </GridContext.Provider>
     </BooleanContext.Provider>
 
