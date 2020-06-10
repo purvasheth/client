@@ -24,6 +24,31 @@ const MainLogic = (props) => {
     const [word] = React.useState(['B', 'I', 'N', 'G', 'O'])
     const [game] = React.useContext(GridContext)
     const [bool, setBool] = React.useContext(BooleanContext)
+    const [textError, setTextError] = React.useState(false)
+
+    function Main(num) {
+        //set the boolean matrix
+        //check the game matrix
+
+        if (num !== "" && num < 26 && num > 0) {
+            let row = 0
+            let col = 0
+            for (let i = 0; i < 5; i++) {
+                for (let j = 0; j < 5; j++) {
+                    if (game[i][j] === num) {
+                        row = i
+                        col = j
+                        break
+                    }
+                }
+            }
+            let newBool = [...bool];
+            newBool[row][col] = false
+            setBool(newBool)
+            Check()
+        }
+
+    }
 
     function Check() {
         let lines = 0
@@ -66,30 +91,6 @@ const MainLogic = (props) => {
 
     }
 
-    function Main(num) {
-        //set the boolean matrix
-        //check the game matrix
-
-        if (num !== "" && num < 26 && num > 0) {
-            let row = 0
-            let col = 0
-            for (let i = 0; i < 5; i++) {
-                for (let j = 0; j < 5; j++) {
-                    if (game[i][j] === num) {
-                        row = i
-                        col = j
-                        break
-                    }
-                }
-            }
-            let newBool = [...bool];
-            newBool[row][col] = false
-            setBool(newBool)
-            Check()
-        }
-
-    }
-
     if (!socket) {
         socket = io('https://rocky-tor-15250.herokuapp.com/')
         //socket = io(':3001');
@@ -97,16 +98,16 @@ const MainLogic = (props) => {
 
     }
 
-    const handleSend = (name, text) => {
-        socket.emit('chat message', [name, text], props.room, id)
-        setMessages([[name, text]])
+    const handleSend = () => {
+        socket.emit('chat message', [props.name, text], props.room, id)
+        setMessages([props.name, text])
         Main(+text)
         setText("")
     }
 
     React.useEffect(() => {
         socket.on('broadcast', (message) => {
-            setMessages([message])
+            setMessages(message)
             Main(+message[1])
         })
 
@@ -162,7 +163,9 @@ const MainLogic = (props) => {
                     label="Number"
                     value={text}
                     onFocus={() => setFocus(false)}
-                    omBlur={() => setFocus(true)}
+                    onBlur={() => setFocus(true)}
+                    error={textError}
+                    helperText={textError ? "Please enter no between 1 and 25" : false}
                     onChange={(e) => setText(e.target.value)}
                 />
                 <br />
@@ -171,12 +174,12 @@ const MainLogic = (props) => {
                     variant="contained" onClick={() => {
 
                         if (text.match("^([1-9]|1[0-9]|2[0-5])$")) {
-                            handleSend(props.name, text)
+                            setTextError(false)
+                            handleSend()
                             setFocus(true)
                         }
                         else {
-                            alert('please enter no between 1 and 25')
-                            setText("");
+                            setTextError(true)
                         }
 
                     }} color="primary">

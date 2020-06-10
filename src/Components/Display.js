@@ -6,11 +6,7 @@ const Display = props => {
         <React.Fragment>
             {props.Messages.length !== 0 && props.focus === true ? <div className="display">
                 {
-                    props.Messages.map(
-                        (chat, i) => (
-                            chat[0] + " : " + chat[1]
-                        )
-                    )
+                    props.Messages[0] + " : " + props.Messages[1]
                 }
             </div > : false
             }

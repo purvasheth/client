@@ -1,7 +1,6 @@
 import React from "react"
-import FormControl from '@material-ui/core/FormControl';
-import TextField from '@material-ui/core/TextField';
-import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField'
+import Button from '@material-ui/core/Button'
 import MainLogic from "./MainLogic"
 import "./App.css"
 
@@ -20,23 +19,21 @@ const LandingPage = () => {
             {
                 id === "" ?
                     < div className="center" >
-                        <FormControl required>
-                            <TextField
-                                error={nameError}
-                                helperText={nameError ? "Required" : false}
-                                label="Name"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                            />
-                            <br />
-                            <TextField
-                                error={roomError}
-                                label="Room"
-                                value={room}
-                                helperText={roomError ? "Required" : false}
-                                onChange={(e) => setRoom(e.target.value)}
-                            />
-                        </FormControl>
+                        <TextField
+                            error={nameError}
+                            helperText={nameError ? "Required" : false}
+                            label="Name"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                        />
+                        <br />
+                        <TextField
+                            error={roomError}
+                            label="Room"
+                            value={room}
+                            helperText={roomError ? "Required" : false}
+                            onChange={(e) => setRoom(e.target.value)}
+                        />
                         <br />
                         <br />
                         <Button variant="contained" onClick={() => {
