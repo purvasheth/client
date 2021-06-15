@@ -1,16 +1,11 @@
-import React, { useState } from 'react';
-import './App.css';
+import React, { useState } from "react";
+import "./App.css";
 import GridContext from "./GridContext";
 import BooleanContext from "./BooleanContext";
-import LandingPage from './LandingPage';
-
-
-
-
+import LandingPage from "./LandingPage";
 
 function App() {
-
-  //Shuffle the 2d array 
+  //Shuffle the 2d array
 
   let start = 1;
   let array = Array(25 - start + 1)
@@ -33,8 +28,8 @@ function App() {
     [true, true, true, true, true],
     [true, true, true, true, true],
     [true, true, true, true, true],
-    [true, true, true, true, true]
-  ])
+    [true, true, true, true, true],
+  ]);
 
   return (
     <BooleanContext.Provider value={bool}>
@@ -42,7 +37,6 @@ function App() {
         <LandingPage />
       </GridContext.Provider>
     </BooleanContext.Provider>
-
   );
 }
 
