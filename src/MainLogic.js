@@ -89,7 +89,7 @@ const MainLogic = (props) => {
   }
 
   if (!socket) {
-    socket = io("https://rocky-tor-15250.herokuapp.com/");
+    socket = io("https://play-bingo-react.herokuapp.com/");
     socket.emit("join", props.name, props.room);
   }
 
